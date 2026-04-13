@@ -1,0 +1,35 @@
+{\rtf1\ansi\deff0
+{\fonttbl{\f0 Calibri;}}
+\fs24
+\b Half-Step India Work Log\b0\par
+\par
+\b Project Folder:\b0 C:\\Users\\mrdhr\\Projects\\hack2skill\par
+\b Last Updated:\b0 13 April 2026\par
+\par
+\b Work Already Completed\b0\par
+- Reviewed the implementation against the requirement documents and confirmed the project is on the correct product track.\par
+- Fixed the Prisma 7 runtime setup so the app uses the supported Postgres adapter pattern.\par
+- Updated the reporting flow to store score, notes, photo URL, latitude, and longitude.\par
+- Fixed the login demo credential mismatch.\par
+- Improved the seed script structure and added district metrics seed data.\par
+- Marked database-backed pages as dynamic so production build does not fail during page data collection.\par
+- Verified that lint passes and production build passes.\par
+- Verified that Prisma client generation passes.\par
+\par
+\b Current Status Checklist\b0\par
+[x] Confirm product direction against requirement documents\par
+[x] Fix build-breaking Prisma and app issues\par
+[x] Make reporting fields closer to MVP database requirements\par
+[x] Verify lint and production build\par
+[x] Detect available local PostgreSQL runtime\par
+[ ] Start or install PostgreSQL locally if missing\par
+[ ] Run Prisma migration against the live database\par
+[ ] Run seed script against the live database\par
+[ ] Final verification of app + database readiness\par
+\par
+\b Notes\b0\par
+- Current remaining blocker is not the codebase. The local Postgres server is not reachable on localhost:5432.\par
+- Checked for Docker, psql, postgres command, existing PostgreSQL installation, winget, and Scoop. None were available for immediate use.\par
+- Attempted PostgreSQL installation through Chocolatey, but machine-level installation requires an Administrator shell. This session cannot complete that install without admin privileges.\par
+- Next action required on the machine: start an existing PostgreSQL server or install PostgreSQL as Administrator, then run migration and seed.\par
+}

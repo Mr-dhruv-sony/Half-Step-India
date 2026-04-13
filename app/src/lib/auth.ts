@@ -38,9 +38,9 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name,
           role: user.role,
-          departmentId: user.departmentId,
-          stateCode: user.stateCode,
-          districtCode: user.districtCode,
+          departmentId: user.departmentId ?? undefined,
+          stateCode: user.stateCode ?? undefined,
+          districtCode: user.districtCode ?? undefined,
         }
       }
     })
