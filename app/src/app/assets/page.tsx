@@ -1,18 +1,89 @@
 import { prisma } from "@/lib/db";
 import Link from "next/link";
 import { getScoreColor, getScoreLabel } from "@/lib/scoring";
+import FilterSelect from "@/components/FilterSelect";
+import { AssetStatus, AssetType, Prisma } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
-async function getAssets() {
+type AssetsSearchParams = Promise<{
+  district?: string;
+  assetType?: string;
+  status?: string;
+  scoreBand?: string;
+}>;
+
+function buildAssetWhere(filters: {
+  district?: string;
+  assetType?: string;
+  status?: string;
+  scoreBand?: string;
+}): Prisma.AssetWhereInput {
+  const where: Prisma.AssetWhereInput = {};
+
+  if (filters.district) {
+    where.districtCode = filters.district;
+  }
+
+  if (filters.status) {
+    where.status = filters.status as AssetStatus;
+  }
+
+  if (filters.assetType && Object.values(AssetType).includes(filters.assetType as AssetType)) {
+    where.assetType = filters.assetType as AssetType;
+  }
+
+  if (filters.scoreBand === "healthy") {
+    where.currentScore = { gte: 1.5 };
+  } else if (filters.scoreBand === "watch") {
+    where.currentScore = { equals: 1.0 };
+  } else if (filters.scoreBand === "critical") {
+    where.currentScore = { lte: 0.5 };
+  }
+
+  return where;
+}
+
+async function getAssets(where: Prisma.AssetWhereInput) {
   return prisma.asset.findMany({
+    where,
     include: { department: true },
     orderBy: { createdAt: "desc" },
   });
 }
 
-export default async function AssetsPage() {
-  const assets = await getAssets();
+async function getAssetFilterOptions() {
+  const [districts] = await Promise.all([
+    prisma.asset.findMany({
+      select: { districtCode: true },
+      distinct: ["districtCode"],
+      orderBy: { districtCode: "asc" },
+    }),
+  ]);
+
+  return {
+    districts: districts.map((item) => ({
+      label: item.districtCode,
+      value: item.districtCode,
+    })),
+    assetTypes: Object.values(AssetType).map((item) => ({
+      label: item.replace("_", " "),
+      value: item,
+    })),
+  };
+}
+
+export default async function AssetsPage({
+  searchParams,
+}: {
+  searchParams: AssetsSearchParams;
+}) {
+  const filters = await searchParams;
+  const where = buildAssetWhere(filters);
+  const [assets, filterOptions] = await Promise.all([
+    getAssets(where),
+    getAssetFilterOptions(),
+  ]);
 
   const statusColors: Record<string, string> = {
     active: "bg-green-100 text-green-800",
@@ -39,6 +110,64 @@ export default async function AssetsPage() {
           + Add Asset
         </Link>
       </header>
+
+      <form
+        action="/assets"
+        method="get"
+        className="mb-6 grid grid-cols-1 gap-4 rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900 md:grid-cols-5"
+      >
+        <FilterSelect
+          label="District"
+          name="district"
+          value={filters.district}
+          options={filterOptions.districts}
+          allLabel="All districts"
+        />
+        <FilterSelect
+          label="Asset Type"
+          name="assetType"
+          value={filters.assetType}
+          options={filterOptions.assetTypes}
+          allLabel="All asset types"
+        />
+        <FilterSelect
+          label="Status"
+          name="status"
+          value={filters.status}
+          options={[
+            { label: "active", value: "active" },
+            { label: "inactive", value: "inactive" },
+            { label: "under maintenance", value: "under_maintenance" },
+            { label: "decommissioned", value: "decommissioned" },
+          ]}
+          allLabel="All statuses"
+        />
+        <FilterSelect
+          label="Score Band"
+          name="scoreBand"
+          value={filters.scoreBand}
+          options={[
+            { label: "healthy", value: "healthy" },
+            { label: "watchlist", value: "watch" },
+            { label: "critical", value: "critical" },
+          ]}
+          allLabel="All score bands"
+        />
+        <div className="flex items-end gap-2">
+          <button
+            type="submit"
+            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          >
+            Apply
+          </button>
+          <Link
+            href="/assets"
+            className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+          >
+            Reset
+          </Link>
+        </div>
+      </form>
 
       <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
         <div className="overflow-x-auto">

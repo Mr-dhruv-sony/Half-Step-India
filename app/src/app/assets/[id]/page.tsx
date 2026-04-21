@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getScoreColor, getScoreLabel } from "@/lib/scoring";
+import AssetTrendChart from "@/components/AssetTrendChart";
 
 export const dynamic = "force-dynamic";
 
@@ -35,6 +36,15 @@ export default async function AssetDetailPage({ params }: AssetDetailPageProps) 
     under_maintenance: "bg-yellow-100 text-yellow-800",
     decommissioned: "bg-red-100 text-red-800",
   };
+
+  const trendData = [...asset.reports]
+    .reverse()
+    .map((report) => ({
+      id: report.id,
+      score: report.score,
+      reportedAt: report.reportedAt.toISOString(),
+      reporterName: report.reporter?.name || "Unknown",
+    }));
 
   return (
     <div>
@@ -109,6 +119,23 @@ export default async function AssetDetailPage({ params }: AssetDetailPageProps) 
                 </p>
               </div>
             </div>
+          </div>
+
+          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
+                  Score Trend
+                </h2>
+                <p className="text-sm text-zinc-500">
+                  Historical condition movement for this asset.
+                </p>
+              </div>
+              <span className="text-xs text-zinc-500">
+                {trendData.length} reports
+              </span>
+            </div>
+            <AssetTrendChart data={trendData} />
           </div>
 
           <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-6">

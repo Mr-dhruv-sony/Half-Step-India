@@ -42,7 +42,7 @@ The `app` folder is the primary project area right now. It already includes the 
 - NextAuth credential-based authentication wiring
 - half-step scoring utilities and alert/work-order evaluation logic
 
-The `frontend` folder exists but is still close to the default Next.js starter and does not appear to be the main active implementation yet.
+The `frontend` folder is still a default Next.js scaffold and is not the active product implementation.
 
 ## Tech Stack
 
@@ -58,22 +58,28 @@ The `frontend` folder exists but is still close to the default Next.js starter a
 
 Implemented in `app/`:
 
-- project bootstrapping with Next.js App Router
+- login page with role-based demo credentials
+- protected dashboard shell and navigation
 - Prisma data model for core entities
 - auth configuration for credential login
 - score validation for allowed half-step values
 - alert/work-order evaluation rules for major score drops
 - Half-Step Index calculation helpers
+- asset list, asset detail, and add-asset flow
+- report submission flow with notes, optional photo URL, and GPS fields
+- alerts listing with acknowledge/unacknowledge actions
+- work-order listing with assignment and status update actions
+- seeded demo data covering users, assets, reports, alerts, and work orders
+- asset trend chart based on historical reports
 
-Still pending or not yet visible in the current codebase:
+Still pending or incomplete:
 
-- login page UI
-- dashboard routes and analytics screens
-- asset CRUD pages and APIs
-- report submission flow
-- file upload flow
-- seeded demo data
-- full end-to-end inspector/admin experience
+- real file upload/storage flow
+- map-based analytics
+- district and asset-type dashboard filters
+- CSV export / bulk upload
+- 90-day failure forecast
+- dedicated citizen complaint workflow
 
 ## Core Alert Logic
 
@@ -107,7 +113,7 @@ The strongest demo path for this project is:
 3. Submits a lower score than the previous report
 4. System calculates score delta
 5. Alert or work order is generated automatically
-6. Dashboard highlights the degrading asset and district trend
+6. Dashboard and asset detail view highlight the degrading trend
 
 ## Local Setup
 
@@ -144,11 +150,11 @@ NEXTAUTH_SECRET=your-secret
 
 ## Recommended Next Steps
 
-- add a real root architecture decision: use only `app/` or merge/remove the duplicate `frontend/`
-- build the missing login and dashboard routes
-- add asset CRUD and report submission APIs
-- seed demo users, assets, and report history
-- wire alert/work-order creation into report submission
+- keep `app/` as the single source of truth for the MVP
+- either archive or remove the unused `frontend/` scaffold after submission
+- replace photo URL input with real upload/storage
+- add dashboard filters and richer analytics views
+- add export and forecast features only after the demo flow is stable
 - prepare one polished judge-facing demo flow before adding optional features
 
 ## Submission Priorities
