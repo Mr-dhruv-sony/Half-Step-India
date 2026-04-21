@@ -1,0 +1,15 @@
+The biggest remaining functional gaps are:
+
+1. Real photo upload and storage instead of photo URL input.
+2. Map-based visualization for degraded assets and district-level monitoring.
+3. CSV export and bulk asset upload support.
+4. Dedicated citizen complaint flow.
+5. Final deployment and submission polish.
+
+Current app status:
+- The active `app/` project is approximately 90% complete for a hackathon-ready MVP.
+- Core workflow is implemented: login, dashboard, asset browsing, asset creation, report submission, automatic alerts, automatic work orders, work-order detail view, filtering, and simple forecast visibility.
+
+Verified:
+- `npm run lint` passed.
+- `npm run build` passed.
