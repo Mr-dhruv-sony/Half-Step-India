@@ -16,6 +16,7 @@ interface NavbarProps {
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: "📊" },
   { href: "/assets", label: "Assets", icon: "🏗️" },
+  { href: "/map", label: "Map", icon: "🗺️" },
   { href: "/reports", label: "Reports", icon: "📝" },
   { href: "/alerts", label: "Alerts", icon: "🔔", roles: MANAGEMENT_ROLES },
   { href: "/work-orders", label: "Work Orders", icon: "🔧", roles: MANAGEMENT_ROLES },
@@ -72,7 +73,7 @@ export default function Navbar({ user }: NavbarProps) {
           <p className="text-xs text-zinc-500">{getRoleLabel(user?.role)}</p>
         </div>
         <button
-          onClick={() => signOut({ callbackUrl: "/login" })}
+          onClick={() => signOut({ callbackUrl: `${window.location.origin}/login` })}
           className="w-full flex items-center gap-3 px-4 py-2.5 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
         >
           <span>🚪</span>

@@ -1,10 +1,24 @@
 import { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
+import GoogleProvider from "next-auth/providers/google"
 import { prisma } from "./db"
 import bcrypt from "bcryptjs"
+import { UserRole } from "@prisma/client"
+
+const googleClientId = process.env.GOOGLE_CLIENT_ID
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET
+
+const googleProvider =
+  googleClientId && googleClientSecret
+    ? GoogleProvider({
+        clientId: googleClientId,
+        clientSecret: googleClientSecret,
+      })
+    : null
 
 export const authOptions: NextAuthOptions = {
   providers: [
+    ...(googleProvider ? [googleProvider] : []),
     CredentialsProvider({
       name: "credentials",
       credentials: {
@@ -49,18 +63,65 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt"
   },
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.role = user.role
-        token.departmentId = user.departmentId
-        token.stateCode = user.stateCode
-        token.districtCode = user.districtCode
+    async signIn({ user, account }) {
+      if (account?.provider !== "google") {
+        return true
       }
+
+      if (!user.email) {
+        return false
+      }
+
+      const normalizedEmail = user.email.toLowerCase()
+      const existingUser = await prisma.user.findUnique({
+        where: { email: normalizedEmail }
+      })
+
+      if (existingUser) {
+        return existingUser.isActive
+      }
+
+      const passwordHash = await bcrypt.hash(crypto.randomUUID(), 10)
+
+      await prisma.user.create({
+        data: {
+          name: user.name?.trim() || normalizedEmail.split("@")[0],
+          email: normalizedEmail,
+          passwordHash,
+          role: UserRole.citizen,
+          isActive: true,
+        }
+      })
+
+      return true
+    },
+    async jwt({ token, user }) {
+      if (user?.email) {
+        token.email = user.email
+      }
+
+      if (token.email) {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: token.email.toLowerCase() }
+        })
+
+        if (dbUser) {
+          token.sub = dbUser.id
+          token.role = dbUser.role
+          token.departmentId = dbUser.departmentId ?? undefined
+          token.stateCode = dbUser.stateCode ?? undefined
+          token.districtCode = dbUser.districtCode ?? undefined
+          token.name = dbUser.name
+        }
+      }
+
       return token
     },
     async session({ session, token }) {
       if (token) {
         session.user.id = token.sub as string
+        session.user.name = token.name
+        session.user.email = token.email
         session.user.role = token.role as string
         session.user.departmentId = token.departmentId as string
         session.user.stateCode = token.stateCode as string
@@ -72,4 +133,5 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/login",
   },
+  secret: process.env.NEXTAUTH_SECRET,
 }
