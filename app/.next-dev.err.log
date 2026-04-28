@@ -1,0 +1,12 @@
+(node:26208) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[next-auth][error][OAUTH_CALLBACK_ERROR] 
+https://next-auth.js.org/errors#oauth_callback_error State cookie was missing. {
+  error: Error [OAuthCallbackError]: State cookie was missing.
+      at ignore-listed frames {
+    code: undefined
+  },
+  providerId: 'google',
+  message: 'State cookie was missing.'
+}
+(node:26208) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
