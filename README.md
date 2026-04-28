@@ -39,7 +39,7 @@ The `app` folder is the primary project area right now. It already includes the 
 
 - Next.js app setup
 - Prisma schema for users, departments, assets, reports, alerts, work orders, and district metrics
-- NextAuth credential-based authentication wiring
+- NextAuth-based authentication with credentials and optional Google provider wiring
 - half-step scoring utilities and alert/work-order evaluation logic
 
 The `frontend` folder is still a default Next.js scaffold and is not the active product implementation.
@@ -48,20 +48,21 @@ The `frontend` folder is still a default Next.js scaffold and is not the active 
 
 - Frontend: `Next.js 16` + `React 19` + `TypeScript`
 - Styling: `Tailwind CSS 4`
-- Auth: `NextAuth` with credentials provider
+- Auth: `NextAuth` with credentials provider and optional Google OAuth
 - Database ORM: `Prisma`
 - Database target: `PostgreSQL`
 - Password hashing: `bcryptjs`
 - Charts: `Recharts`
+- Map: `Leaflet` + `React-Leaflet`
 
 ## Current Implementation Status
 
 Implemented in `app/`:
 
-- login page with role-based demo credentials
+- login page with demo login, signup flow, and optional Google sign-in
 - protected dashboard shell and navigation
 - Prisma data model for core entities
-- auth configuration for credential login
+- auth configuration for credential login plus optional Google-based account creation
 - score validation for allowed half-step values
 - alert/work-order evaluation rules for major score drops
 - Half-Step Index calculation helpers
@@ -69,17 +70,18 @@ Implemented in `app/`:
 - report submission flow with notes, optional photo URL, and GPS fields
 - alerts listing with acknowledge/unacknowledge actions
 - work-order listing with assignment and status update actions
+- interactive map view with district, asset type, and score-band filters
+- dashboard filters for district, asset type, and score band
+- 90-day rule-based failure watch on the dashboard
 - seeded demo data covering users, assets, reports, alerts, and work orders
 - asset trend chart based on historical reports
 
 Still pending or incomplete:
 
 - real file upload/storage flow
-- map-based analytics
-- district and asset-type dashboard filters
 - CSV export / bulk upload
-- 90-day failure forecast
 - dedicated citizen complaint workflow
+- public deployment and production polish
 
 ## Core Alert Logic
 
@@ -148,13 +150,21 @@ NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=your-secret
 ```
 
+If you want to enable Google sign-in, you will also need:
+
+```env
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=true
+```
+
 ## Recommended Next Steps
 
 - keep `app/` as the single source of truth for the MVP
 - either archive or remove the unused `frontend/` scaffold after submission
 - replace photo URL input with real upload/storage
-- add dashboard filters and richer analytics views
-- add export and forecast features only after the demo flow is stable
+- extend the current map and dashboard analytics into richer district-level monitoring
+- add export and bulk-upload features only after the demo flow is stable
 - prepare one polished judge-facing demo flow before adding optional features
 
 ## Submission Priorities
