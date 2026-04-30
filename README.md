@@ -2,7 +2,7 @@
  
 > **AI-powered public infrastructure monitoring for early intervention — before assets fail.**
  
-![Half-Step India Dashboard](./screenshots/dashboard.png)
+![Half-Step India Dashboard](./app/screenshots/dashboard.png)
  
 ---
  
@@ -65,11 +65,11 @@ Four roles with scoped permissions: `admin`, `department_officer`, `field_inspec
  
 | Login | Dashboard | Asset Map |
 |-------|-----------|-----------|
-| ![Login](./screenshots/login.png) | ![Dashboard](./screenshots/dashboard.png) | ![Map](./screenshots/map.png) |
+| ![Login](./app/screenshots/login.png) | ![Dashboard](./app/screenshots/dashboard.png) | ![Map](./app/screenshots/map.png) |
  
 | Assets | Reports | Alerts |
 |--------|---------|--------|
-| ![Assets](./screenshots/assets.png) | ![Reports](./screenshots/reports.png) | ![Alerts](./screenshots/alerts.png) |
+| ![Assets](./app/screenshots/assets.png) | ![Reports](./app/screenshots/reports.png) | ![Alerts](./app/screenshots/alerts.png) |
  
 ---
  
