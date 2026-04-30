@@ -1,182 +1,183 @@
-# Hack2Skill
-
-Hack2Skill is a hackathon MVP for monitoring public infrastructure through a half-step condition scoring system. The platform is designed to help teams detect asset degradation early, trigger maintenance workflows before complete failure, and present district-level health insights through dashboards and reporting tools.
-
-## Problem Statement
-
-Public assets such as roads, streetlights, toilets, benches, hospital lines, and water pumps are often repaired only after full failure. Hack2Skill introduces a fractional scoring model so teams can identify deterioration earlier and act before assets become non-functional.
-
-## Core Idea
-
-Every asset is scored using five fixed values:
-
-- `2.0` = perfect
-- `1.5` = minor degradation
-- `1.0` = moderate degradation
-- `0.5` = severe degradation
-- `0.0` = non-functional
-
-Instead of waiting for a binary working/not-working state, the system tracks score drops over time, flags risky decline patterns, and generates alerts or work orders when thresholds are crossed.
-
-## MVP Goals
-
-- Register and manage public assets with location and department data
-- Support role-based access for `admin`, `department_officer`, `field_inspector`, and `citizen`
-- Record condition reports with score, notes, timestamp, photo, and geolocation
-- Trigger alerts and work orders from score-drop rules
-- Show district-level degradation summaries and trend insights
-- Prepare a strong hackathon demo with seeded sample data and one complete end-to-end scenario
-
-## Current Repository Structure
-
-```text
-hack2skill/
-  app/        -> main implementation workspace
-  frontend/   -> separate Next.js scaffold, currently default starter
-```
-
-The `app` folder is the primary project area right now. It already includes the main technical foundation for the MVP:
-
-- Next.js app setup
-- Prisma schema for users, departments, assets, reports, alerts, work orders, and district metrics
-- NextAuth-based authentication with credentials and optional Google provider wiring
-- half-step scoring utilities and alert/work-order evaluation logic
-
-The `frontend` folder is still a default Next.js scaffold and is not the active product implementation.
-
+# Half-Step India
+ 
+> **AI-powered public infrastructure monitoring for early intervention — before assets fail.**
+ 
+![Half-Step India Dashboard](./screenshots/dashboard.png)
+ 
+---
+ 
+## The Problem
+ 
+India's public infrastructure — roads, streetlights, water lines, toilets, benches — is repaired only after complete failure. By then, the cost is higher, the impact on citizens is worse, and the damage is harder to reverse.
+ 
+There is no widely used system that tracks *gradual* degradation, alerts the right departments proactively, or gives decision-makers a real-time view of infrastructure health across districts.
+ 
+**Half-Step India was built to change that.**
+ 
+---
+ 
+## What It Does
+ 
+Half-Step India is a full-stack infrastructure monitoring platform that introduces a **fractional condition scoring model** — so teams can detect asset deterioration early and act before things break down completely.
+ 
+Every public asset is tracked on a five-point health scale:
+ 
+| Score | Condition |
+|-------|-----------|
+| `2.0` | Perfect |
+| `1.5` | Minor Degradation |
+| `1.0` | Moderate Degradation |
+| `0.5` | Severe Degradation |
+| `0.0` | Non-Functional |
+ 
+When scores drop across reports, the system automatically triggers **alerts** and **work orders** — pushing maintenance signals to the right people before assets reach failure.
+ 
+---
+ 
+## Key Features
+ 
+### 📊 Live Dashboard
+Real-time overview of asset health across all districts. Filter by district, asset type, and score band. Includes a 90-day failure watch for assets trending downward.
+ 
+### 🗺️ Interactive Asset Map
+Visualise every monitored asset on a Leaflet-powered map with colour-coded health indicators — green (healthy) to red (critical).
+ 
+### 📋 Asset Management
+Add, view, and manage public assets with full metadata: department, location, type, and historical score trends.
+ 
+### 🔔 Smart Alerts
+Automated alerts fire when score thresholds are crossed:
+- `1.5 → 1.0` → Medium alert
+- `1.0 → 0.5` → High alert + Work Order
+- Any drop to `0.0` → Critical alert + Critical Work Order
+### 📝 Condition Reports
+Field inspectors and citizens can submit condition reports with notes, photo links, GPS coordinates, and timestamped scores.
+ 
+### 🔧 Work Orders
+Automatically generated or manually created work orders with assignment, priority tracking, and status updates.
+ 
+### 👥 Role-Based Access
+Four roles with scoped permissions: `admin`, `department_officer`, `field_inspector`, and `citizen`.
+ 
+---
+ 
+## Screenshots
+ 
+| Login | Dashboard | Asset Map |
+|-------|-----------|-----------|
+| ![Login](./screenshots/login.png) | ![Dashboard](./screenshots/dashboard.png) | ![Map](./screenshots/map.png) |
+ 
+| Assets | Reports | Alerts |
+|--------|---------|--------|
+| ![Assets](./screenshots/assets.png) | ![Reports](./screenshots/reports.png) | ![Alerts](./screenshots/alerts.png) |
+ 
+---
+ 
 ## Tech Stack
-
-- Frontend: `Next.js 16` + `React 19` + `TypeScript`
-- Styling: `Tailwind CSS 4`
-- Auth: `NextAuth` with credentials provider and optional Google OAuth
-- Database ORM: `Prisma`
-- Database target: `PostgreSQL`
-- Password hashing: `bcryptjs`
-- Charts: `Recharts`
-- Map: `Leaflet` + `React-Leaflet`
-
-## Current Implementation Status
-
-Implemented in `app/`:
-
-- login page with demo login, signup flow, and optional Google sign-in
-- protected dashboard shell and navigation
-- Prisma data model for core entities
-- auth configuration for credential login plus optional Google-based account creation
-- score validation for allowed half-step values
-- alert/work-order evaluation rules for major score drops
-- Half-Step Index calculation helpers
-- asset list, asset detail, and add-asset flow
-- report submission flow with notes, optional photo URL, and GPS fields
-- alerts listing with acknowledge/unacknowledge actions
-- work-order listing with assignment and status update actions
-- interactive map view with district, asset type, and score-band filters
-- dashboard filters for district, asset type, and score band
-- 90-day rule-based failure watch on the dashboard
-- seeded demo data covering users, assets, reports, alerts, and work orders
-- asset trend chart based on historical reports
-
-Still pending or incomplete:
-
-- real file upload/storage flow
-- CSV export / bulk upload
-- dedicated citizen complaint workflow
-- public deployment and production polish
-
-## Core Alert Logic
-
-The current scoring utility follows these key rules:
-
-- `1.5 -> 1.0` creates a medium alert
-- `1.0 -> 0.5` creates a high alert and a work order
-- any drop to `0.0` creates a critical alert and critical work order
-- larger rapid drops can also trigger high-priority handling
-
-## Data Model
-
-The Prisma schema currently defines:
-
-- `Department`
-- `User`
-- `Asset`
-- `AssetReport`
-- `Alert`
-- `WorkOrder`
-- `DistrictMetricsDaily`
-
-This matches the hackathon plan closely and provides the base needed for reporting, scoring, alerting, and district-level summaries.
-
-## Suggested Demo Story
-
-The strongest demo path for this project is:
-
-1. Admin or inspector logs in
-2. Opens an existing public asset
-3. Submits a lower score than the previous report
-4. System calculates score delta
-5. Alert or work order is generated automatically
-6. Dashboard and asset detail view highlight the degrading trend
-
-## Local Setup
-
-### Main App
-
+ 
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 16 + React 19 + TypeScript |
+| Styling | Tailwind CSS 4 |
+| Auth | NextAuth (Credentials + Google OAuth) |
+| ORM | Prisma |
+| Database | PostgreSQL |
+| Maps | Leaflet + React-Leaflet |
+| Charts | Recharts |
+| Password Hashing | bcryptjs |
+ 
+---
+ 
+## Getting Started
+ 
+### Prerequisites
+ 
+- Node.js 18+
+- PostgreSQL database
+### 1. Clone the repository
+ 
+```bash
+git clone https://github.com/Mr-dhruv-sony/Half-Step-India.git
+cd Half-Step-India
+```
+ 
+### 2. Install dependencies
+ 
 ```bash
 cd app
 npm install
-npm run dev
 ```
-
-### Secondary Frontend Scaffold
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-## Environment Notes
-
-The Prisma setup expects a PostgreSQL connection string through:
-
+ 
+### 3. Configure environment variables
+ 
+Create a `.env` file in the `app/` directory:
+ 
 ```env
-DATABASE_URL=postgresql://...
-```
-
-For the auth flow, you will also likely need standard NextAuth environment variables when the login flow is completed, such as:
-
-```env
+DATABASE_URL=postgresql://your_user:your_password@localhost:5432/halfstepindia
+ 
 NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=your-secret
+NEXTAUTH_SECRET=your-secret-key
 ```
-
-If you want to enable Google sign-in, you will also need:
-
+ 
+To enable Google OAuth (optional):
+ 
 ```env
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=true
 ```
-
-## Recommended Next Steps
-
-- keep `app/` as the single source of truth for the MVP
-- either archive or remove the unused `frontend/` scaffold after submission
-- replace photo URL input with real upload/storage
-- extend the current map and dashboard analytics into richer district-level monitoring
-- add export and bulk-upload features only after the demo flow is stable
-- prepare one polished judge-facing demo flow before adding optional features
-
-## Submission Priorities
-
-For hackathon delivery, the priority should remain:
-
-- complete one stable end-to-end workflow first
-- keep the score-drop logic correct
-- seed convincing demo data
-- document setup, features, and demo credentials clearly
-- polish only after the workflow is reliable
-
+ 
+### 4. Set up the database
+ 
+```bash
+npx prisma migrate dev
+npx prisma db seed
+```
+ 
+### 5. Run the development server
+ 
+```bash
+npm run dev
+```
+ 
+Visit [http://localhost:3000](http://localhost:3000)
+ 
+### Demo Login
+ 
+Use the **Demo Login** button on the login page to explore the platform with pre-seeded data — no account creation needed.
+ 
+---
+ 
+## Data Model
+ 
+```
+Department
+User              (admin / department_officer / field_inspector / citizen)
+Asset             (location, type, department, current score)
+AssetReport       (score, notes, photo, GPS, timestamp)
+Alert             (severity, status, trigger rule)
+WorkOrder         (priority, assignment, status)
+DistrictMetricsDaily
+```
+  
 ## Project Vision
+ 
+Half-Step India is built on a simple belief: **small drops in condition are signals, not noise.**
+ 
+The goal is to help governments and municipalities move from reactive repair cycles to early intervention — using real data from the ground to act before public assets fail and before citizens are affected.
+ 
+Infrastructure degradation doesn't happen overnight. Half-Step India makes sure we don't miss the warning signs.
+ 
+---
+ 
+## Team
+ 
+Built with ❤️ by **Dhruv Sony**, **Raj**, and **Sanjana**
+ 
+---
+ 
+## License
 
-Hack2Skill is aimed at helping teams move from reactive repair to early intervention. The value of the product is not only in collecting reports, but in turning small drops in asset condition into actionable maintenance signals before public infrastructure reaches failure.
+ 
+[MIT](./LICENSE)
+ 
